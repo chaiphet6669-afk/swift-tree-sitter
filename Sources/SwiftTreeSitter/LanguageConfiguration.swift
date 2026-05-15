@@ -156,7 +156,7 @@ extension Query {
 			guard fileURL.pathExtension == "scm" else {
 				continue
 			}
-			guard FileManager.default.isReadableFile(atPath: fileURL.path) else {
+			guard try fileURL.resourceValues(forKeys: [.isReadableKey]).isReadable == true else {
 				continue
 			}
 			
