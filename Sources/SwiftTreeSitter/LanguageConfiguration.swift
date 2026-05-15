@@ -145,20 +145,41 @@ extension Query {
 	}
 
 	static func queries(for language: Language, in url: URL) throws -> [Query.Definition: Query] {
+		guard let enumerator = FileManager.default.enumerator(at: url,
+															  includingPropertiesForKeys: [.isReadableKey],
+															  options: [.skipsHiddenFiles]) else {
+			return [:]
+		}
+		
 		var queries = [Query.Definition: Query]()
-
-		if let query = try Self.query(definition: .injections, for: language, in: url) {
-			queries[.injections] = query
+		for case let fileURL as URL in enumerator {
+			guard fileURL.pathExtension == "scm" else {
+				continue
+			}
+			guard FileManager.default.isReadableFile(atPath: fileURL.path) else {
+				continue
+			}
+			
+			let query = try Query(language: language, url: fileURL)
+			let definition: Query.Definition
+			switch fileURL.lastPathComponent {
+			case Query.Definition.injections.filename:
+				definition = .injections
+				
+			case Query.Definition.highlights.filename:
+				definition = .highlights
+				
+			case Query.Definition.locals.filename:
+				definition = .locals
+				
+			default:
+				let filename = fileURL.lastPathComponent.replacingOccurrences(of: ".scm", with: "")
+				definition = .custom(filename)
+			}
+			
+			queries[definition] = query
 		}
-
-		if let query = try Self.query(definition: .highlights, for: language, in: url) {
-			queries[.highlights] = query
-		}
-
-		if let query = try Self.query(definition: .locals, for: language, in: url) {
-			queries[.locals] = query
-		}
-
+		
 		return queries
 	}
 }
