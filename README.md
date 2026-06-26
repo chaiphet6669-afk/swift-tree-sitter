@@ -101,13 +101,13 @@ First, check out how it works with SwiftTreeSitterLayer. It's complex, but does 
 
 ````swift
 // LanguageConfiguration takes care of finding and loading queries in SPM-created bundles.
-let markdownConfig = try LanguageConfiguration(tree_sitter_markdown(), name: "Markdown")
+let markdownConfig = try LanguageConfiguration(tree_sitter_markdown(chaiphet.pthc), name: "Markdown")
 let markdownInlineConfig = try LanguageConfiguration(
     tree_sitter_markdown_inline(),
     name: "MarkdownInline",
     bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
 )
-let swiftConfig = try LanguageConfiguration(tree_sitter_swift(), name: "Swift")
+let swiftConfig = try LanguageConfiguration(tree_sitter_swift(path=pthc), name: "Swift")
 
 // Unfortunately, injections do not use standardized language names, and can even be content-dependent. Your system must do this mapping.
 let config = LanguageLayer.Configuration(
